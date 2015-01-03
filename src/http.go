@@ -8,15 +8,23 @@ import (
 )
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	template_path := "index.html"
-	template, _ := template.ParseFiles(template_path)
+	templatePath := "index.html"
+	template, _ := template.ParseFiles(templatePath)
 	template.Execute(w, nil)
 	fmt.Println("Hit index.html")
+}
+
+func game(w http.ResponseWriter, r *http.Request) {
+	templatePath := "game.html"
+	template, _ := template.ParseFiles(templatePath)
+	template.Execute(w, nil)
+	fmt.Println("Hit game.html")
 }
 
 func main() {
     r := mux.NewRouter()
     r.HandleFunc("/", hello)
+    r.HandleFunc("/game/{gameId}", game)
     r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
     http.Handle("/", r)
     http.ListenAndServe(":8000", nil)
