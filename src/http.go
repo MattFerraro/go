@@ -15,9 +15,16 @@ func hello(w http.ResponseWriter, r *http.Request) {
 }
 
 func game(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	gameId := vars["gameId"]
+	fmt.Println(gameId)
+
+	gameMap := make(map[string]string)
+	gameMap["GameId"] = gameId
+
 	templatePath := "game.html"
 	template, _ := template.ParseFiles(templatePath)
-	template.Execute(w, nil)
+	template.Execute(w, gameMap)
 	fmt.Println("Hit game.html")
 }
 
