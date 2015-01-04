@@ -8,15 +8,49 @@ import (
 	"io"
 	"github.com/gorilla/mux"
 	"github.com/twinj/uuid"
+	"encoding/json"
 	_ "bufio"
 	_ "io/ioutil"
 )
+
+type Move struct {
+	// A Move is just a coordinate but if it has the special value (-1, -1)
+	// it represents a skipped move
+	X int
+	Y int
+}
+type Game struct {
+    Uuid string
+    Player1 string
+    Player2 string
+    Moves []Move
+}
+
+/*  Custom marshal and unmarshal methods are needed because without them, the
+    list of moves looks like this:
+		[{"X":8,"Y":4}, ...]
+	With the custom marshalling, the list of moves looks like this:
+		[[8,4], ...]
+	Which uses 5 bytes per move instead of 13
+*/
+func (m Move) MarshalJSON() ([]byte, error) {
+    return json.Marshal([]int{m.X, m.Y})
+}
+func (m *Move) UnmarshalJSON(data []byte) error {
+    var coordinate [2]int
+    json.Unmarshal(data, &coordinate)
+    m.X = coordinate[0]
+    m.Y = coordinate[1]
+    return nil
+}
 
 func check(e error) {
     if e != nil {
         panic(e)
     }
 }
+
+
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	templatePath := "index.html"
@@ -45,10 +79,21 @@ func newGame(w http.ResponseWriter, r *http.Request) {
 	u := uuid.NewV4()
 	io.WriteString(w, u.String())
 
+	var g Game
+	g.Uuid = u.String()
+	g.Player1 = "foo"
+	g.Player2 = "bar"
+	g.Moves = append(g.Moves, Move{5, 5})
+	g.Moves = append(g.Moves, Move{5, 6})
+
+	b, _ := json.Marshal(g)
+
 	// Create a file with this name and initialize it
 	f, err := os.Create("./" + u.String() + ".json")
     check(err)
     defer f.Close()
+	f.Write(b)
+	f.WriteString("\n")
 }
 
 func main() {
