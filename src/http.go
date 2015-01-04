@@ -1,16 +1,16 @@
 package main
 
 import (
+	_ "bufio"
+	"encoding/json"
 	"fmt"
-	"net/http"
-	"text/template"
-	"os"
-	"io"
 	"github.com/gorilla/mux"
 	"github.com/twinj/uuid"
-	"encoding/json"
-	_ "bufio"
+	"io"
 	"io/ioutil"
+	"net/http"
+	"os"
+	"text/template"
 )
 
 type Move struct {
@@ -20,11 +20,11 @@ type Move struct {
 	Y int
 }
 type Game struct {
-    Uuid string
-    Player1 string
-    Player2 string
-    Size int
-    Moves []Move
+	Uuid    string
+	Player1 string
+	Player2 string
+	Size    int
+	Moves   []Move
 }
 
 /*  Custom marshal and unmarshal methods are needed because without them, the
@@ -35,23 +35,21 @@ type Game struct {
 	Which uses 5 bytes per move instead of 13
 */
 func (m Move) MarshalJSON() ([]byte, error) {
-    return json.Marshal([]int{m.X, m.Y})
+	return json.Marshal([]int{m.X, m.Y})
 }
 func (m *Move) UnmarshalJSON(data []byte) error {
-    var coordinate [2]int
-    json.Unmarshal(data, &coordinate)
-    m.X = coordinate[0]
-    m.Y = coordinate[1]
-    return nil
+	var coordinate [2]int
+	json.Unmarshal(data, &coordinate)
+	m.X = coordinate[0]
+	m.Y = coordinate[1]
+	return nil
 }
 
 func check(e error) {
-    if e != nil {
-        panic(e)
-    }
+	if e != nil {
+		panic(e)
+	}
 }
-
-
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	templatePath := "index.html"
@@ -80,14 +78,14 @@ func gameData(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(gameId)
 
 	dat, err := ioutil.ReadFile("./" + gameId + ".json")
-    check(err)
+	check(err)
 
-    // To ensure that all strings served from this method are in fact valid
-    // json, it is necessary to try unmarshalling the data before returning it
-    var game Game
-    check(json.Unmarshal(dat, &game))
+	// To ensure that all strings served from this method are in fact valid
+	// json, it is necessary to try unmarshalling the data before returning it
+	var game Game
+	check(json.Unmarshal(dat, &game))
 
-    io.WriteString(w, string(dat))
+	io.WriteString(w, string(dat))
 }
 
 func newGame(w http.ResponseWriter, r *http.Request) {
@@ -108,8 +106,8 @@ func newGame(w http.ResponseWriter, r *http.Request) {
 
 	// Create a file with this name and initialize it
 	f, err := os.Create("./" + u.String() + ".json")
-    check(err)
-    defer f.Close()
+	check(err)
+	defer f.Close()
 	f.Write(b)
 	f.WriteString("\n")
 }
@@ -119,16 +117,15 @@ func main() {
 	uuid.SwitchFormat(uuid.CleanHyphen)
 
 	// Setup all routes and serve
-    r := mux.NewRouter()
-    r.HandleFunc("/", hello)
-    r.HandleFunc("/newgame", newGame)
-    r.HandleFunc("/game/{gameId}", game)
-    r.HandleFunc("/gamedata/{gameId}", gameData)
-    r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
-    http.Handle("/", r)
-    http.ListenAndServe(":8000", nil)
+	r := mux.NewRouter()
+	r.HandleFunc("/", hello)
+	r.HandleFunc("/newgame", newGame)
+	r.HandleFunc("/game/{gameId}", game)
+	r.HandleFunc("/gamedata/{gameId}", gameData)
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
+	http.Handle("/", r)
+	http.ListenAndServe(":8000", nil)
 }
-
 
 // Misc notes:
 /*
