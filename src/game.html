@@ -17,15 +17,21 @@
 			</div>
 		</div>
 		<div class="row">
-			<canvas id="board" onclick="boardClick()" width="500px" height="500px"></canvas>
+			<canvas id="board" width="700px" height="700px"></canvas>
 		</div>
 	</div>
 
 	<script>
 	$.getJSON("/gamedata/{{.GameId}}", function(data) {
-		console.log(data);
-
 		repaintBoard(data["Size"], data["Moves"]);
+
+		$("#board").click(function(event) {
+			boardClick(data["Size"], event);
+		});
+
+		$("#board").mousemove(function(event) {
+			boardMouseover(data["Size"], data["Moves"], event);
+		});
 	})
 
 	</script>

@@ -100,7 +100,7 @@ func newGame(w http.ResponseWriter, r *http.Request) {
 	g.Player2 = "bar"
 	g.Moves = append(g.Moves, Move{0, 0})
 	g.Moves = append(g.Moves, Move{1, 1})
-	g.Size = 19
+	g.Size = 13
 
 	b, _ := json.Marshal(g)
 
