@@ -10,7 +10,7 @@ import (
 	"github.com/twinj/uuid"
 	"encoding/json"
 	_ "bufio"
-	_ "io/ioutil"
+	"io/ioutil"
 )
 
 type Move struct {
@@ -23,6 +23,7 @@ type Game struct {
     Uuid string
     Player1 string
     Player2 string
+    Size int
     Moves []Move
 }
 
@@ -73,6 +74,22 @@ func game(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Hit game.html")
 }
 
+func gameData(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	gameId := vars["gameId"]
+	fmt.Println(gameId)
+
+	dat, err := ioutil.ReadFile("./" + gameId + ".json")
+    check(err)
+
+    // To ensure that all strings served from this method are in fact valid
+    // json, it is necessary to try unmarshalling the data before returning it
+    var game Game
+    check(json.Unmarshal(dat, &game))
+
+    io.WriteString(w, string(dat))
+}
+
 func newGame(w http.ResponseWriter, r *http.Request) {
 	// The UUID for this game which will be used everywhere
 	// as this game's identifier
@@ -85,6 +102,7 @@ func newGame(w http.ResponseWriter, r *http.Request) {
 	g.Player2 = "bar"
 	g.Moves = append(g.Moves, Move{5, 5})
 	g.Moves = append(g.Moves, Move{5, 6})
+	g.Size = 19
 
 	b, _ := json.Marshal(g)
 
@@ -105,6 +123,7 @@ func main() {
     r.HandleFunc("/", hello)
     r.HandleFunc("/newgame", newGame)
     r.HandleFunc("/game/{gameId}", game)
+    r.HandleFunc("/gamedata/{gameId}", gameData)
     r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
     http.Handle("/", r)
     http.ListenAndServe(":8000", nil)
@@ -121,5 +140,6 @@ func main() {
 	people making very primitive AIs shouldn't have to roll their own board
 	generator.
 
-
+	game and gameData http endpoints should be merged and the returned type
+	(either html or json) should reflect the mimetype requested
 */

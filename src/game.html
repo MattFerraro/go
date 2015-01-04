@@ -22,7 +22,12 @@
 	</div>
 
 	<script>
+	$.getJSON("/gamedata/{{.GameId}}", function(data) {
+		console.log(data);
+
 		repaintBoard();
+	})
+
 	</script>
 </body>
 </html>
