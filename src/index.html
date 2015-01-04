@@ -14,11 +14,18 @@
 		<div class="row">
 			<div class="col-lg-6">
 				<h1>Let's Play Go!</h1>
-				<a href="/game/1234">
-					<button type="button" id="newGame" class="btn btn-primary btn-lg">New Game</button>
-				</a>
+				<button type="button" onclick="newGame()" id="newGame" class="btn btn-primary btn-lg">New Game</button>
 			</div>
 		</div>
 	</div>
+
+	<script>
+	function newGame() {
+		$.get("/newgame", function(data) {
+			console.log(data);
+			window.location.href = '/game/' + data;
+		});
+	}
+	</script>
 </body>
 </html>
