@@ -1,13 +1,11 @@
 
-var size = 13;
 var width = 500;
 
 function boardClick() {
 	console.log("CLICKED");
 }
 
-function repaintBoard() {
-	console.log("loaded");
+function repaintBoard(size, moves) {
 	var board = $("#board")[0];
 	var ctx = board.getContext("2d");
 	ctx.fillStyle = "#EDB809";
@@ -24,5 +22,23 @@ function repaintBoard() {
 		ctx.moveTo(increment * (i + 1), increment);
 		ctx.lineTo(increment * (i + 1), increment * size);
 		ctx.stroke();
+	}
+
+
+	for (var i = 0; i < moves.length; i++) {
+		console.log(moves[i]);
+		var x = (moves[i][0] + 1) * increment;
+		var y = (moves[i][1] + 1) * increment;
+
+		if (i % 2 == 0) {
+			ctx.fillStyle = "#FFFFFF"
+		}
+		else {
+			ctx.fillStyle = "#000000"
+		}
+
+		ctx.beginPath();
+		ctx.arc(x, y, increment / 2, 0, 2 * Math.PI, false);
+		ctx.fill();
 	}
 }

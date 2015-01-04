@@ -28,7 +28,7 @@ type Game struct {
 }
 
 /*  Custom marshal and unmarshal methods are needed because without them, the
-    list of moves looks like this:
+	list of moves looks like this:
 		[{"X":8,"Y":4}, ...]
 	With the custom marshalling, the list of moves looks like this:
 		[[8,4], ...]
@@ -98,8 +98,8 @@ func newGame(w http.ResponseWriter, r *http.Request) {
 	g.Uuid = u.String()
 	g.Player1 = "foo"
 	g.Player2 = "bar"
-	g.Moves = append(g.Moves, Move{5, 5})
-	g.Moves = append(g.Moves, Move{5, 6})
+	g.Moves = append(g.Moves, Move{0, 0})
+	g.Moves = append(g.Moves, Move{1, 1})
 	g.Size = 19
 
 	b, _ := json.Marshal(g)

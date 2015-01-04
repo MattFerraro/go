@@ -25,7 +25,7 @@
 	$.getJSON("/gamedata/{{.GameId}}", function(data) {
 		console.log(data);
 
-		repaintBoard();
+		repaintBoard(data["Size"], data["Moves"]);
 	})
 
 	</script>
