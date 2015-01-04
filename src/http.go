@@ -4,11 +4,19 @@ import (
 	"fmt"
 	"net/http"
 	"text/template"
-	_ "io/ioutil"
+	"os"
 	"io"
 	"github.com/gorilla/mux"
 	"github.com/twinj/uuid"
+	_ "bufio"
+	_ "io/ioutil"
 )
+
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	templatePath := "index.html"
@@ -36,6 +44,11 @@ func newGame(w http.ResponseWriter, r *http.Request) {
 	// as this game's identifier
 	u := uuid.NewV4()
 	io.WriteString(w, u.String())
+
+	// Create a file with this name and initialize it
+	f, err := os.Create("./" + u.String() + ".json")
+    check(err)
+    defer f.Close()
 }
 
 func main() {
@@ -62,4 +75,6 @@ func main() {
 	This SHOULD be figure-out-able given just the history of moves, but
 	people making very primitive AIs shouldn't have to roll their own board
 	generator.
+
+
 */
