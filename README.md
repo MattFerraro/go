@@ -3,8 +3,9 @@ Go
 
 This is a server, written in [Go](https://golang.org/), for playing the game [Go](http://en.wikipedia.org/wiki/Go_%28game%29).
 
-The reason I built this is to build AIs for playing the game Go. The eventual goal is to stand this up publically and let people play AIs.
+I built this so I could program AIs for playing the game. The eventual goal is to stand this up publically and let people play against AIs.
 
+Fair warning: I don't actually know how to play the game nor do I know the language. Pull requests more than welcome.
 
 Eventual Features:
 ==
