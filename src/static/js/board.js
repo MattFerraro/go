@@ -48,10 +48,10 @@ function repaintBoard(size, moves, possibleMove) {
 		var y = (moves[i][1] + 1) * increment;
 
 		if (i % 2 == 0) {
-			ctx.fillStyle = "#FFFFFF"
+			ctx.fillStyle = "#000000"
 		}
 		else {
-			ctx.fillStyle = "#000000"
+			ctx.fillStyle = "#FFFFFF"
 		}
 
 		ctx.beginPath();
