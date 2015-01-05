@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"text/template"
+	"strconv"
 )
 
 type Move struct {
@@ -75,7 +76,6 @@ func game(w http.ResponseWriter, r *http.Request) {
 func gameData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	gameId := vars["gameId"]
-	fmt.Println(gameId)
 
 	dat, err := ioutil.ReadFile("./" + gameId + ".json")
 	check(err)
@@ -83,9 +83,55 @@ func gameData(w http.ResponseWriter, r *http.Request) {
 	// To ensure that all strings served from this method are in fact valid
 	// json, it is necessary to try unmarshalling the data before returning it
 	var game Game
+	fmt.Println("This is the sat dat:", string(dat))
 	check(json.Unmarshal(dat, &game))
 
 	io.WriteString(w, string(dat))
+}
+
+func move(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	gameId := vars["gameId"]
+	x, e := strconv.Atoi(vars["x"])
+	check(e)
+	y, e := strconv.Atoi(vars["y"])
+	check(e)
+
+	/* TODO: Add validation to make sure this move is legal. That means
+		- Does not intersect an existing piece
+	*/
+
+	// TODO: remove any stones that don't have any liberties
+
+	/* TODO: Add more move validation, once the above two are in place:
+		- Does not violate ko
+		- Does not cause suicide
+	*/
+	gameFilename := "./" + gameId + ".json"
+	game := readGameFromFile(gameFilename)
+	game.Moves = append(game.Moves, Move{x, y})
+	writeGameToFile(game, gameFilename)
+
+	b, _ := json.Marshal(game)
+	io.WriteString(w, string(b))
+}
+
+func readGameFromFile(filename string) Game{
+	dat, err := ioutil.ReadFile(filename)
+	check(err)
+	var game Game
+	check(json.Unmarshal(dat, &game))
+	return game
+}
+
+func writeGameToFile(game Game, filename string) {
+	b, _ := json.Marshal(game)
+	f, err := os.Create(filename)
+	check(err)
+	f.Write(b)
+	f.WriteString("\n")
+	f.Sync()
+	f.Close()
 }
 
 func newGame(w http.ResponseWriter, r *http.Request) {
@@ -122,6 +168,7 @@ func main() {
 	r.HandleFunc("/newgame", newGame)
 	r.HandleFunc("/game/{gameId}", game)
 	r.HandleFunc("/gamedata/{gameId}", gameData)
+	r.HandleFunc("/move/{gameId}/{x}/{y}", move)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	http.Handle("/", r)
 	http.ListenAndServe(":8000", nil)

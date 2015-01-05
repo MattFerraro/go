@@ -1,24 +1,53 @@
 
 var width = 700;
+var size;
+var moves;
+var data;
+var gameId;
 
-function boardClick(size, event) {
+var tentativeX;
+var tentativeY;
+
+$(function() {
+	$("#board").click(boardClick);
+	$("#board").mousemove(boardMouseover);
+});
+
+
+function setGameId(newGameId) {
+	gameId = newGameId;
+}
+
+function freshDataCallback(freshData) {
+	data = JSON.parse(freshData);
+	size = data["Size"]
+	moves = data["Moves"]
+	repaintBoard();
+}
+
+function getFreshData() {
+	$.get("/gamedata/" + gameId, freshDataCallback);
+}
+
+function boardClick(event) {
 	var increment = width / (size + 1);
 	var x = Math.round(event.offsetX / increment - 1);
 	var y = Math.round(event.offsetY / increment - 1);
 
-	console.log(x);
-	console.log(y);
+	$.post("/move/" + gameId + "/" + x + "/" + y, freshDataCallback);
 }
 
-function boardMouseover(size, moves, event) {
+function boardMouseover(event) {
 	var increment = width / (size + 1);
 	var x = Math.round(event.offsetX / increment - 1);
 	var y = Math.round(event.offsetY / increment - 1);
 
-	repaintBoard(size, moves, [x, y]);
+	tentativeX = x;
+	tentativeY = y;
+	repaintBoard();
 }
 
-function repaintBoard(size, moves, possibleMove) {
+function repaintBoard() {
 	var board = $("#board")[0];
 	var ctx = board.getContext("2d");
 	ctx.fillStyle = "#EDB809";
@@ -59,23 +88,23 @@ function repaintBoard(size, moves, possibleMove) {
 		ctx.fill();
 	}
 
-	if (typeof possibleMove !== 'undefined') {
-		var x = possibleMove[0];
-		var y = possibleMove[1];
-		if (x >= 0 && y >= 0 && x < size && y < size) {
-	    	if (moves.length % 2 == 0) {
-				ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-			}
-			else {
-				ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-			}
+	// if (typeof possibleMove !== 'undefined') {
+	// 	var x = possibleMove[0];
+	// 	var y = possibleMove[1];
+	// 	if (x >= 0 && y >= 0 && x < size && y < size) {
+	//     	if (moves.length % 2 == 0) {
+	// 			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+	// 		}
+	// 		else {
+	// 			ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+	// 		}
 
-			var x = (possibleMove[0] + 1) * increment;
-			var y = (possibleMove[1] + 1) * increment;
+	// 		var x = (possibleMove[0] + 1) * increment;
+	// 		var y = (possibleMove[1] + 1) * increment;
 
-			ctx.beginPath();
-			ctx.arc(x, y, increment / 2, 0, 2 * Math.PI, false);
-			ctx.fill();
-		}
-	}
+	// 		ctx.beginPath();
+	// 		ctx.arc(x, y, increment / 2, 0, 2 * Math.PI, false);
+	// 		ctx.fill();
+	// 	}
+	// }
 }

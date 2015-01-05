@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-	<script src="/js/board.js"></script>
 	<script src="/js/jquery-2.1.3.min.js"></script>
+	<script src="/js/board.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/css/bootstrap-theme.min.css">
@@ -22,17 +22,9 @@
 	</div>
 
 	<script>
-	$.getJSON("/gamedata/{{.GameId}}", function(data) {
-		repaintBoard(data["Size"], data["Moves"]);
 
-		$("#board").click(function(event) {
-			boardClick(data["Size"], event);
-		});
-
-		$("#board").mousemove(function(event) {
-			boardMouseover(data["Size"], data["Moves"], event);
-		});
-	})
+	setGameId("{{.GameId}}");
+	getFreshData();
 
 	</script>
 </body>
